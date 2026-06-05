@@ -24,6 +24,7 @@ body {
     padding: 8px;
     background: #ececec;
     border-bottom: 1px solid #bbb;
+    flex-wrap: wrap;
 }
 
 button {
@@ -49,6 +50,10 @@ canvas {
     <button id="pencilBtn" class="active">Pencil</button>
     <button id="eraserBtn">Eraser</button>
 
+    <button id="rectStampBtn">Rectangle</button>
+    <button id="circleStampBtn">Circle</button>
+    <button id="triangleStampBtn">Triangle</button>
+
     <input type="color" id="color" value="#000000">
 
     <label>Size:</label>
@@ -70,6 +75,7 @@ const sizeInput = document.getElementById("size");
 
 let drawing = false;
 let tool = "pencil";
+let stampSize = 50;
 
 function resizeCanvas() {
     const image = document.createElement("canvas");
@@ -91,16 +97,34 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
+function setTool(newTool, activeButton) {
+    tool = newTool;
+
+    document.querySelectorAll("#toolbar button").forEach(btn => {
+        btn.classList.remove("active");
+    });
+
+    activeButton.classList.add("active");
+}
+
 document.getElementById("pencilBtn").addEventListener("click", () => {
-    tool = "pencil";
-    document.getElementById("pencilBtn").classList.add("active");
-    document.getElementById("eraserBtn").classList.remove("active");
+    setTool("pencil", document.getElementById("pencilBtn"));
 });
 
 document.getElementById("eraserBtn").addEventListener("click", () => {
-    tool = "eraser";
-    document.getElementById("eraserBtn").classList.add("active");
-    document.getElementById("pencilBtn").classList.remove("active");
+    setTool("eraser", document.getElementById("eraserBtn"));
+});
+
+document.getElementById("rectStampBtn").addEventListener("click", () => {
+    setTool("rectangle", document.getElementById("rectStampBtn"));
+});
+
+document.getElementById("circleStampBtn").addEventListener("click", () => {
+    setTool("circle", document.getElementById("circleStampBtn"));
+});
+
+document.getElementById("triangleStampBtn").addEventListener("click", () => {
+    setTool("triangle", document.getElementById("triangleStampBtn"));
 });
 
 function getMousePos(event) {
@@ -113,9 +137,46 @@ function getMousePos(event) {
 }
 
 canvas.addEventListener("pointerdown", (event) => {
-    drawing = true;
-
     const pos = getMousePos(event);
+
+    if (tool === "rectangle") {
+        ctx.fillStyle = colorInput.value;
+        ctx.fillRect(
+            pos.x - stampSize / 2,
+            pos.y - stampSize / 2,
+            stampSize,
+            stampSize
+        );
+        return;
+    }
+
+    if (tool === "circle") {
+        ctx.fillStyle = colorInput.value;
+        ctx.beginPath();
+        ctx.arc(
+            pos.x,
+            pos.y,
+            stampSize / 2,
+            0,
+            Math.PI * 2
+        );
+        ctx.fill();
+        return;
+    }
+
+    if (tool === "triangle") {
+        ctx.fillStyle = colorInput.value;
+
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y - stampSize / 2);
+        ctx.lineTo(pos.x - stampSize / 2, pos.y + stampSize / 2);
+        ctx.lineTo(pos.x + stampSize / 2, pos.y + stampSize / 2);
+        ctx.closePath();
+        ctx.fill();
+        return;
+    }
+
+    drawing = true;
 
     ctx.beginPath();
     ctx.moveTo(pos.x, pos.y);
@@ -166,7 +227,7 @@ document.getElementById("saveBtn").addEventListener("click", () => {
 
     fileName = fileName.trim();
 
-    if (!fileName) {
+    if (fileName === "") {
         fileName = "drawing";
     }
 
