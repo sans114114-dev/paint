@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Paint</title>
-//this makes the border/ buttons
+
 <style>
 * {
     box-sizing: border-box;
@@ -149,7 +149,7 @@ canvas.addEventListener("pointerup", () => {
 canvas.addEventListener("pointercancel", () => {
     drawing = false;
 });
-    
+
 canvas.addEventListener("pointerleave", () => {
     drawing = false;
 });
@@ -160,8 +160,18 @@ document.getElementById("clearBtn").addEventListener("click", () => {
 });
 
 document.getElementById("saveBtn").addEventListener("click", () => {
+    let fileName = prompt("Enter a file name:", "drawing");
+
+    if (fileName === null) return;
+
+    fileName = fileName.trim();
+
+    if (!fileName) {
+        fileName = "drawing";
+    }
+
     const link = document.createElement("a");
-    link.download = "drawing.png";
+    link.download = fileName + ".png";
     link.href = canvas.toDataURL("image/png");
     link.click();
 });
