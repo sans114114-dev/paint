@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Paint</title>
-
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,sans-serif;
+}
 
 body{
     overflow:hidden;
@@ -26,15 +30,40 @@ body{
 #homeScreen{
     position:relative;
     overflow:hidden;
+    flex-direction:column;
     justify-content:center;
     align-items:center;
     background:
-    radial-gradient(circle at top left,#6aa9ff,transparent 40%),
-    radial-gradient(circle at bottom right,#9f6aff,transparent 40%),
-    linear-gradient(135deg,#1e293b,#0f172a);
+        radial-gradient(circle at top left,#6aa9ff,transparent 40%),
+        radial-gradient(circle at bottom right,#9f6aff,transparent 40%),
+        linear-gradient(135deg,#1e293b,#0f172a);
+}
+
+#homeScreen::before{
+    content:"";
+    position:absolute;
+    width:1200px;
+    height:1200px;
+    border-radius:50%;
+    background:rgba(255,255,255,.03);
+    top:-600px;
+    left:-600px;
+}
+
+#homeScreen::after{
+    content:"";
+    position:absolute;
+    width:800px;
+    height:800px;
+    border-radius:50%;
+    background:rgba(255,255,255,.03);
+    bottom:-400px;
+    right:-400px;
 }
 
 .homeCard{
+    position:relative;
+    z-index:1;
     width:min(90vw,650px);
     padding:40px;
     border-radius:24px;
@@ -42,12 +71,14 @@ body{
     backdrop-filter:blur(12px);
     border:1px solid rgba(255,255,255,.15);
     text-align:center;
+    box-shadow:0 20px 60px rgba(0,0,0,.4);
 }
 
 .homeTitle{
-    font-size:72px;
+    font-size:70px;
     color:white;
     font-weight:900;
+    letter-spacing:3px;
 }
 
 .homeSubtitle{
@@ -58,10 +89,10 @@ body{
 .homeBtn{
     width:100%;
     padding:16px;
-    margin-top:12px;
     font-size:20px;
+    margin-top:12px;
     border:none;
-    border-radius:12px;
+    border-radius:14px;
     cursor:pointer;
 }
 
@@ -74,9 +105,13 @@ body{
 
 .themeBtn{
     height:50px;
-    border:none;
     border-radius:12px;
+    border:2px solid white;
     cursor:pointer;
+}
+
+.activeTheme{
+    transform:scale(1.08);
 }
 
 #galleryScreen{
@@ -100,6 +135,13 @@ body{
 
 .galleryItem img{
     width:100%;
+    border:1px solid #aaa;
+}
+
+.galleryItem button{
+    width:100%;
+    margin-top:8px;
+    padding:8px;
 }
 
 #paintScreen{
@@ -113,20 +155,6 @@ body{
     padding:8px;
     background:#ececec;
     border-bottom:1px solid #bbb;
-    position:relative;
-}
-
-#settingsPanel{
-    display:none;
-    position:absolute;
-    top:55px;
-    left:8px;
-    background:white;
-    border:1px solid #999;
-    padding:10px;
-    border-radius:10px;
-    z-index:1000;
-    min-width:220px;
 }
 
 button{
@@ -149,17 +177,17 @@ canvas{
 
 <div id="homeScreen" class="screen active">
     <div class="homeCard">
-        <div class="homeTitle">PAINT</div>
-        <div class="homeSubtitle">Create, save and manage drawings</div>
+        <h1 class="homeTitle">PAINT</h1>
+        <div class="homeSubtitle">Create, save, and manage your drawings</div>
 
         <button class="homeBtn" id="newCanvasBtn">🎨 New Canvas</button>
         <button class="homeBtn" id="galleryBtn">🖼 My Gallery</button>
 
         <div id="themeGrid">
-            <button class="themeBtn" style="background:linear-gradient(135deg,#1e293b,#0f172a)"></button>
-            <button class="themeBtn" style="background:linear-gradient(135deg,#0f766e,#164e63)"></button>
-            <button class="themeBtn" style="background:linear-gradient(135deg,#7c3aed,#1d4ed8)"></button>
-            <button class="themeBtn" style="background:linear-gradient(135deg,#b91c1c,#ea580c)"></button>
+            <button class="themeBtn activeTheme" style="background:linear-gradient(135deg,#1e293b,#0f172a)" data-theme="theme1"></button>
+            <button class="themeBtn" style="background:linear-gradient(135deg,#0f766e,#164e63)" data-theme="theme2"></button>
+            <button class="themeBtn" style="background:linear-gradient(135deg,#7c3aed,#1d4ed8)" data-theme="theme3"></button>
+            <button class="themeBtn" style="background:linear-gradient(135deg,#b91c1c,#ea580c)" data-theme="theme4"></button>
         </div>
 
         <button class="homeBtn" id="customThemeBtn">✨ Create Your Own Theme</button>
@@ -175,22 +203,6 @@ canvas{
 
 <div id="paintScreen" class="screen">
     <div id="toolbar">
-
-        <button id="settingsBtn">⚙️</button>
-
-        <div id="settingsPanel">
-            <div>
-                <strong>Background</strong>
-            </div>
-            <br>
-
-            <input type="file" id="bgImageInput" accept="image/*">
-            <br><br>
-
-            <button id="drawBackgroundBtn">Draw Background</button>
-            <button id="clearBackgroundBtn">Clear Background</button>
-        </div>
-
         <button id="homeBtn">Home</button>
 
         <button id="pencilBtn" class="activeTool">Pencil</button>
@@ -200,20 +212,20 @@ canvas{
         <button id="rectStampBtn">Rectangle</button>
         <button id="circleStampBtn">Circle</button>
         <button id="triangleStampBtn">Triangle</button>
+        <button id="setBackgroundBtn">Set as Background</button>
 
         <button id="undoBtn">Undo</button>
         <button id="redoBtn">Redo</button>
 
-        <input type="color" id="color" value="#000000">
+        <input type="color" id="color" value="#000000" />
 
-        <label>Size</label>
-        <input type="range" id="size" min="1" max="50" value="3">
+        <label>Size:</label>
+        <input type="range" id="size" min="1" max="50" value="3" />
 
         <button id="saveGalleryBtn">Save To Gallery</button>
         <button id="clearBtn">Clear</button>
         <button id="saveBtn">Save PNG</button>
     </div>
-
     <canvas id="canvas"></canvas>
 </div>
 
@@ -221,197 +233,194 @@ canvas{
 const homeScreen=document.getElementById("homeScreen");
 const galleryScreen=document.getElementById("galleryScreen");
 const paintScreen=document.getElementById("paintScreen");
-
 const canvas=document.getElementById("canvas");
 const ctx=canvas.getContext("2d");
 
 const colorInput=document.getElementById("color");
 const sizeInput=document.getElementById("size");
 
-let tool="pencil";
 let drawing=false;
-let drawingBackground=false;
+let tool="pencil";
 
 const undoStack=[];
 const redoStack=[];
 
+const themes={
+theme1:"radial-gradient(circle at top left,#6aa9ff,transparent 40%),radial-gradient(circle at bottom right,#9f6aff,transparent 40%),linear-gradient(135deg,#1e293b,#0f172a)",
+theme2:"radial-gradient(circle at top left,#5eead4,transparent 40%),radial-gradient(circle at bottom right,#67e8f9,transparent 40%),linear-gradient(135deg,#0f766e,#164e63)",
+theme3:"radial-gradient(circle at top left,#c084fc,transparent 40%),radial-gradient(circle at bottom right,#60a5fa,transparent 40%),linear-gradient(135deg,#7c3aed,#1d4ed8)",
+theme4:"radial-gradient(circle at top left,#fb7185,transparent 40%),radial-gradient(circle at bottom right,#fdba74,transparent 40%),linear-gradient(135deg,#b91c1c,#ea580c)"
+};
+
+// Function to show specific screen
 function showScreen(screen){
-    document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-    screen.classList.add("active");
-    if(screen===paintScreen) resizeCanvas();
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  screen.classList.add("active");
+  if(screen===paintScreen) resizeCanvas();
 }
 
+// Resize canvas to fit window and preserve content
 function resizeCanvas(){
-    if(!paintScreen.classList.contains("active")) return;
-
-    const temp=document.createElement("canvas");
-    temp.width=canvas.width||1;
-    temp.height=canvas.height||1;
-
-    temp.getContext("2d").drawImage(canvas,0,0);
-
-    canvas.width=window.innerWidth;
-    canvas.height=window.innerHeight-document.querySelector("#paintScreen #toolbar").offsetHeight;
-
-    ctx.fillStyle="white";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.drawImage(temp,0,0);
+  if(!paintScreen.classList.contains("active")) return;
+  const temp=document.createElement("canvas");
+  temp.width=canvas.width||1;
+  temp.height=canvas.height||1;
+  temp.getContext("2d").drawImage(canvas,0,0);
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight - document.querySelector("#paintScreen #toolbar").offsetHeight;
+  ctx.fillStyle="white";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.drawImage(temp,0,0);
 }
 
 window.addEventListener("resize",resizeCanvas);
 
+// Save current state for undo
 function saveState(){
-    redoStack.length=0;
-    undoStack.push(canvas.toDataURL());
-    if(undoStack.length>50) undoStack.shift();
+  redoStack.length=0;
+  undoStack.push(canvas.toDataURL());
+  if(undoStack.length>50) undoStack.shift();
 }
 
-function restoreState(state){
-    const img=new Image();
+// Restore state from saved data
+function restoreState(data){
+  const img=new Image();
+  img.onload=()=>{
+    ctx.fillStyle="white";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(img,0,0);
+  };
+  img.src=data;
+}
 
-    img.onload=()=>{
+// Manage gallery in local storage
+function getGallery(){
+  return JSON.parse(localStorage.getItem("paintGallery")||"[]");
+}
+function saveGallery(data){
+  localStorage.setItem("paintGallery",JSON.stringify(data));
+}
+
+// Render gallery items
+function renderGallery(){
+  const grid=document.getElementById("galleryGrid");
+  grid.innerHTML="";
+  const gallery=getGallery();
+  gallery.slice().reverse().forEach((item,index)=>{
+    const card=document.createElement("div");
+    card.className="galleryItem";
+    card.innerHTML=`
+      <img src="${item.image}">
+      <div>${item.name}</div>
+      <button class="openBtn">Open</button>
+      <button class="deleteBtn">Delete</button>
+    `;
+    card.querySelector(".openBtn").onclick=()=>{
+      showScreen(paintScreen);
+      const img=new Image();
+      img.onload=()=>{
         ctx.fillStyle="white";
         ctx.fillRect(0,0,canvas.width,canvas.height);
         ctx.drawImage(img,0,0);
+        saveState();
+      };
+      img.src=item.image;
     };
-
-    img.src=state;
+    card.querySelector(".deleteBtn").onclick=()=>{
+      const all=getGallery();
+      all.splice(all.length-1-index,1);
+      saveGallery(all);
+      renderGallery();
+    };
+    grid.appendChild(card);
+  });
 }
 
-function getMousePos(e){
-    const rect=canvas.getBoundingClientRect();
-
-    return {
-        x:Math.floor(e.clientX-rect.left),
-        y:Math.floor(e.clientY-rect.top)
-    };
-}
-
+// Set tool and highlight button
 function setTool(name,button){
-    tool=name;
-
-    document.querySelectorAll("#paintScreen button").forEach(btn=>{
-        btn.classList.remove("activeTool");
-    });
-
-    button.classList.add("activeTool");
+  tool=name;
+  document.querySelectorAll("#paintScreen button").forEach(b=>b.classList.remove("activeTool"));
+  button.classList.add("activeTool");
 }
 
+// Get mouse position relative to canvas
+function getMousePos(e){
+  const rect=canvas.getBoundingClientRect();
+  return{
+    x:Math.floor(e.clientX-rect.left),
+    y:Math.floor(e.clientY-rect.top)
+  };
+}
+
+// Convert hex color to RGB object
 function hexToRgb(hex){
-    return{
-        r:parseInt(hex.substr(1,2),16),
-        g:parseInt(hex.substr(3,2),16),
-        b:parseInt(hex.substr(5,2),16)
-    };
+  return{
+    r:parseInt(hex.slice(1,3),16),
+    g:parseInt(hex.slice(3,5),16),
+    b:parseInt(hex.slice(5,7),16)
+  };
 }
 
+// Flood fill algorithm
 function floodFill(x,y,color){
-    const imageData=ctx.getImageData(0,0,canvas.width,canvas.height);
-    const data=imageData.data;
-
-    const start=(y*canvas.width+x)*4;
-
-    const tr=data[start];
-    const tg=data[start+1];
-    const tb=data[start+2];
-    const ta=data[start+3];
-
-    const stack=[[x,y]];
-
-    while(stack.length){
-        const [cx,cy]=stack.pop();
-
-        if(cx<0||cy<0||cx>=canvas.width||cy>=canvas.height) continue;
-
-        const pos=(cy*canvas.width+cx)*4;
-
-        if(
-            data[pos]!==tr||
-            data[pos+1]!==tg||
-            data[pos+2]!==tb||
-            data[pos+3]!==ta
-        ) continue;
-
-        data[pos]=color.r;
-        data[pos+1]=color.g;
-        data[pos+2]=color.b;
-        data[pos+3]=255;
-
-        stack.push([cx+1,cy]);
-        stack.push([cx-1,cy]);
-        stack.push([cx,cy+1]);
-        stack.push([cx,cy-1]);
-    }
-
-    ctx.putImageData(imageData,0,0);
+  const imageData=ctx.getImageData(0,0,canvas.width,canvas.height);
+  const data=imageData.data;
+  const start=(y*canvas.width+x)*4;
+  const tr=data[start],tg=data[start+1],tb=data[start+2],ta=data[start+3];
+  const stack=[[x,y]];
+  while(stack.length){
+    const [cx,cy]=stack.pop();
+    if(cx<0||cy<0||cx>=canvas.width||cy>=canvas.height) continue;
+    const pos=(cy*canvas.width+cx)*4;
+    if(data[pos]!==tr||data[pos+1]!==tg||data[pos+2]!==tb||data[pos+3]!==ta) continue;
+    data[pos]=color.r;
+    data[pos+1]=color.g;
+    data[pos+2]=color.b;
+    data[pos+3]=255;
+    stack.push([cx+1,cy],[cx-1,cy],[cx,cy+1],[cx,cy-1]);
+  }
+  ctx.putImageData(imageData,0,0);
 }
 
-function getGallery(){
-    return JSON.parse(localStorage.getItem("paintGallery")||"[]");
-}
+// Theme button click handling for background change
+document.querySelectorAll(".themeBtn").forEach(btn => {
+  btn.onclick = () => {
+    // Remove active class from all theme buttons
+    document.querySelectorAll(".themeBtn").forEach(b => b.classList.remove("activeTheme"));
+    // Add active class to clicked button
+    btn.classList.add("activeTheme");
+    // Set the background of homeScreen to the selected theme
+    homeScreen.style.background = themes[btn.dataset.theme];
+  };
+});
 
-function saveGalleryData(data){
-    localStorage.setItem("paintGallery",JSON.stringify(data));
-}
+// Theme button references
+const customThemeBtn=document.getElementById("customThemeBtn");
+const newCanvasBtn=document.getElementById("newCanvasBtn");
+const galleryBtn=document.getElementById("galleryBtn");
+const galleryBackBtn=document.getElementById("galleryBackBtn");
+const homeBtn=document.getElementById("homeBtn");
+const pencilBtn=document.getElementById("pencilBtn");
+const eraserBtn=document.getElementById("eraserBtn");
+const fillBtn=document.getElementById("fillBtn");
+const rectStampBtn=document.getElementById("rectStampBtn");
+const circleStampBtn=document.getElementById("circleStampBtn");
+const triangleStampBtn=document.getElementById("triangleStampBtn");
+const setBackgroundBtn=document.getElementById("setBackgroundBtn");
 
-function renderGallery(){
-    const grid=document.getElementById("galleryGrid");
-    grid.innerHTML="";
-
-    const gallery=getGallery();
-
-    gallery.forEach((item,index)=>{
-        const card=document.createElement("div");
-        card.className="galleryItem";
-
-        card.innerHTML=`
-        <img src="${item.image}">
-        <p>${item.name}</p>
-        <button>Open</button>
-        <button>Delete</button>
-        `;
-
-        card.querySelectorAll("button")[0].onclick=()=>{
-            showScreen(paintScreen);
-
-            const img=new Image();
-
-            img.onload=()=>{
-                ctx.fillStyle="white";
-                ctx.fillRect(0,0,canvas.width,canvas.height);
-                ctx.drawImage(img,0,0,canvas.width,canvas.height);
-                saveState();
-            };
-
-            img.src=item.image;
-        };
-
-        card.querySelectorAll("button")[1].onclick=()=>{
-            const data=getGallery();
-            data.splice(index,1);
-            saveGalleryData(data);
-            renderGallery();
-        };
-
-        grid.appendChild(card);
-    });
-}
-
+// Button event handlers
 newCanvasBtn.onclick=()=>{
-    showScreen(paintScreen);
-
-    ctx.fillStyle="white";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-
-    undoStack.length=0;
-    redoStack.length=0;
-
-    saveState();
+  showScreen(paintScreen);
+  ctx.fillStyle="white";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  undoStack.length=0;
+  redoStack.length=0;
+  saveState();
 };
 
 galleryBtn.onclick=()=>{
-    renderGallery();
-    showScreen(galleryScreen);
+  renderGallery();
+  showScreen(galleryScreen);
 };
 
 galleryBackBtn.onclick=()=>showScreen(homeScreen);
@@ -424,169 +433,120 @@ rectStampBtn.onclick=()=>setTool("rectangle",rectStampBtn);
 circleStampBtn.onclick=()=>setTool("circle",circleStampBtn);
 triangleStampBtn.onclick=()=>setTool("triangle",triangleStampBtn);
 
-settingsBtn.onclick=()=>{
-    settingsPanel.style.display=
-    settingsPanel.style.display==="block"?"none":"block";
-};
-
-drawBackgroundBtn.onclick=()=>{
-    drawingBackground=!drawingBackground;
-    drawBackgroundBtn.textContent=
-    drawingBackground?"Stop Drawing Background":"Draw Background";
-};
-
-clearBackgroundBtn.onclick=()=>{
-    saveState();
-    ctx.fillStyle="white";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-};
-
-bgImageInput.onchange=(e)=>{
-    const file=e.target.files[0];
-    if(!file) return;
-
-    const reader=new FileReader();
-
-    reader.onload=(ev)=>{
-        saveState();
-
-        const img=new Image();
-
-        img.onload=()=>{
-            ctx.drawImage(img,0,0,canvas.width,canvas.height);
-        };
-
-        img.src=ev.target.result;
-    };
-
-    reader.readAsDataURL(file);
-};
-
+// Canvas drawing events
 canvas.addEventListener("pointerdown",e=>{
-    const pos=getMousePos(e);
-    const shapeSize=parseInt(sizeInput.value)*10;
-
-    if(drawingBackground){
-        saveState();
-        drawing=true;
-        return;
-    }
-
-    if(tool==="fill"){
-        saveState();
-        floodFill(pos.x,pos.y,hexToRgb(colorInput.value));
-        return;
-    }
-
-    if(tool==="rectangle"){
-        saveState();
-        ctx.fillStyle=colorInput.value;
-        ctx.fillRect(pos.x-shapeSize/2,pos.y-shapeSize/2,shapeSize,shapeSize);
-        return;
-    }
-
-    if(tool==="circle"){
-        saveState();
-        ctx.fillStyle=colorInput.value;
-        ctx.beginPath();
-        ctx.arc(pos.x,pos.y,shapeSize/2,0,Math.PI*2);
-        ctx.fill();
-        return;
-    }
-
-    if(tool==="triangle"){
-        saveState();
-        ctx.fillStyle=colorInput.value;
-        ctx.beginPath();
-        ctx.moveTo(pos.x,pos.y-shapeSize/2);
-        ctx.lineTo(pos.x-shapeSize/2,pos.y+shapeSize/2);
-        ctx.lineTo(pos.x+shapeSize/2,pos.y+shapeSize/2);
-        ctx.closePath();
-        ctx.fill();
-        return;
-    }
-
+  const pos=getMousePos(e);
+  const shapeSize=parseInt(sizeInput.value)*10;
+  if(tool==="fill"){
     saveState();
-    drawing=true;
+    floodFill(pos.x,pos.y,hexToRgb(colorInput.value));
+    return;
+  }
+  if(tool==="rectangle"){
+    saveState();
+    ctx.fillStyle=colorInput.value;
+    ctx.fillRect(pos.x-shapeSize/2,pos.y-shapeSize/2,shapeSize,shapeSize);
+    return;
+  }
+  if(tool==="circle"){
+    saveState();
+    ctx.fillStyle=colorInput.value;
     ctx.beginPath();
-    ctx.moveTo(pos.x,pos.y);
+    ctx.arc(pos.x,pos.y,shapeSize/2,0,Math.PI*2);
+    ctx.fill();
+    return;
+  }
+  if(tool==="triangle"){
+    saveState();
+    ctx.fillStyle=colorInput.value;
+    ctx.beginPath();
+    ctx.moveTo(pos.x,pos.y-shapeSize/2);
+    ctx.lineTo(pos.x-shapeSize/2,pos.y+shapeSize/2);
+    ctx.lineTo(pos.x+shapeSize/2,pos.y+shapeSize/2);
+    ctx.closePath();
+    ctx.fill();
+    return;
+  }
+  saveState();
+  drawing=true;
+  ctx.beginPath();
+  ctx.moveTo(pos.x,pos.y);
+  canvas.setPointerCapture(e.pointerId);
 });
-
 canvas.addEventListener("pointermove",e=>{
-    if(!drawing) return;
-
-    const pos=getMousePos(e);
-
-    if(drawingBackground){
-        ctx.fillStyle=colorInput.value;
-        ctx.beginPath();
-        ctx.arc(pos.x,pos.y,parseInt(sizeInput.value)*5,0,Math.PI*2);
-        ctx.fill();
-        return;
-    }
-
-    ctx.lineWidth=parseInt(sizeInput.value);
-    ctx.lineCap="round";
-    ctx.lineJoin="round";
-
-    ctx.strokeStyle=
-    tool==="eraser"?"#FFFFFF":colorInput.value;
-
-    ctx.lineTo(pos.x,pos.y);
-    ctx.stroke();
+  if(!drawing) return;
+  const pos=getMousePos(e);
+  ctx.lineWidth=parseInt(sizeInput.value);
+  ctx.lineCap="round";
+  ctx.lineJoin="round";
+  ctx.strokeStyle=tool==="eraser"?"#FFFFFF":colorInput.value;
+  ctx.lineTo(pos.x,pos.y);
+  ctx.stroke();
 });
-
 canvas.addEventListener("pointerup",()=>drawing=false);
 canvas.addEventListener("pointerleave",()=>drawing=false);
 canvas.addEventListener("pointercancel",()=>drawing=false);
 
+// Undo & redo
 undoBtn.onclick=()=>{
-    if(undoStack.length<=1) return;
-
-    redoStack.push(undoStack.pop());
-    restoreState(undoStack[undoStack.length-1]);
+  if(undoStack.length<=1) return;
+  redoStack.push(undoStack.pop());
+  restoreState(undoStack[undoStack.length-1]);
 };
-
 redoBtn.onclick=()=>{
-    if(!redoStack.length) return;
-
-    const state=redoStack.pop();
-    undoStack.push(state);
-    restoreState(state);
+  if(!redoStack.length) return;
+  const state=redoStack.pop();
+  undoStack.push(state);
+  restoreState(state);
 };
 
+// Clear canvas
 clearBtn.onclick=()=>{
-    saveState();
-    ctx.fillStyle="white";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
+  saveState();
+  ctx.fillStyle="white";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
 };
 
+// Save current canvas as background when button clicked
+setBackgroundBtn.onclick=()=>{
+  const dataURL = canvas.toDataURL("image/png");
+  homeScreen.style.background = `url(${dataURL}) no-repeat center center / cover`;
+};
+
+// Save to gallery
 saveGalleryBtn.onclick=()=>{
-    const name=prompt("Drawing name","My Drawing");
-    if(name===null) return;
-
-    const gallery=getGallery();
-
-    gallery.push({
-        name:name||"My Drawing",
-        image:canvas.toDataURL("image/png")
-    });
-
-    saveGalleryData(gallery);
+  const name=prompt("Drawing name","My Drawing");
+  if(name===null) return;
+  const gallery=getGallery();
+  gallery.push({
+    name:name||"My Drawing",
+    image:canvas.toDataURL("image/png")
+  });
+  saveGallery(gallery);
 };
 
+// Save PNG
 saveBtn.onclick=()=>{
-    let fileName=prompt("Enter a file name","drawing");
-
-    if(fileName===null) return;
-
-    fileName=fileName.trim()||"drawing";
-
-    const link=document.createElement("a");
-    link.download=fileName+".png";
-    link.href=canvas.toDataURL("image/png");
-    link.click();
+  let fileName=prompt("Enter a file name","drawing");
+  if(fileName===null) return;
+  fileName=fileName.trim()||"drawing";
+  const link=document.createElement("a");
+  link.download=fileName+".png";
+  link.href=canvas.toDataURL("image/png");
+  link.click();
 };
+
+// --- Additional: handle theme button clicks for background change ---
+document.querySelectorAll(".themeBtn").forEach(btn => {
+  btn.onclick = () => {
+    // Remove active class from all theme buttons
+    document.querySelectorAll(".themeBtn").forEach(b => b.classList.remove("activeTheme"));
+    // Add active class to clicked button
+    btn.classList.add("activeTheme");
+    // Set the background of homeScreen to the selected theme
+    homeScreen.style.background = themes[btn.dataset.theme];
+  };
+});
 </script>
 
 </body>
